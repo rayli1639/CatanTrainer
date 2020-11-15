@@ -40,7 +40,7 @@ public class Board {
                 int randNum = numbers.get((int) (Math.random() * numbers.size()));
                 numbers.remove(new Integer(randNum));
                 if (randNum == 0) {
-                    row.add(new Hex(Resource.DESERT, randNum, false));
+                    row.add(new Hex(false));
                 } else {
                     Object[] resKeys = resources.keySet().toArray();
                     while (true) {

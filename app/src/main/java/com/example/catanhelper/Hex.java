@@ -16,13 +16,17 @@ public class Hex {
         this.num = num;
         this.portCon = portCon;
     }
-    Resource getRes() {
+    public Resource getRes() {
         return res;
     }
-    int getNum() {
+    public int getNum() {
         return num;
     }
-    boolean getPortCon() {
+    public boolean getPortCon() {
         return portCon;
+    }
+    @Override
+    public String toString() {
+        return String.format("[[%s : %d]]", res, num);
     }
 }

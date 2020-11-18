@@ -2,17 +2,17 @@ package com.example.catanhelper;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff;
 import android.graphics.Region;
 import android.util.AttributeSet;
-import android.view.View;
+import androidx.appcompat.widget.AppCompatImageView;
 
-public class BoardView extends View {
+public class BoardView extends AppCompatImageView {
     private Path hexagonPath;
     private Path hexagonBorderPath;
-    private float radius;
-    private float width, height;
-    private int maskColor;
+    private Paint mBorderPaint;
 
     public BoardView(Context context) {
         super(context);
@@ -30,63 +30,70 @@ public class BoardView extends View {
     }
 
     private void init() {
-        hexagonPath = new Path();
-        hexagonBorderPath = new Path();
-        maskColor = 0xFF01FF77;
+        this.hexagonPath = new Path();
+        this.hexagonBorderPath = new Path();
+
+        this.mBorderPaint = new Paint();
+        this.mBorderPaint.setColor(Color.WHITE);
+        this.mBorderPaint.setStrokeCap(Paint.Cap.ROUND);
+        this.mBorderPaint.setStrokeWidth(50f);
+        this.mBorderPaint.setStyle(Paint.Style.STROKE);
     }
 
-    public void setRadius(float r) {
-        this.radius = r;
-        calculatePath();
+    public void setRadius(float radius) {
+        calculatePath(radius);
     }
 
-    public void setMaskColor(int color) {
-        this.maskColor = color;
+    public void setBorderColor(int color) {
+        this.mBorderPaint.setColor(color);
         invalidate();
     }
 
-    private void calculatePath() {
-        float triangleHeight = (float) (Math.sqrt(3) * radius / 2);
-        float centerX = width / 2;
-        float centerY = height / 2;
-        hexagonPath.moveTo(centerX, centerY + radius);
-        hexagonPath.lineTo(centerX - triangleHeight, centerY + radius / 2);
-        hexagonPath.lineTo(centerX - triangleHeight, centerY - radius / 2);
-        hexagonPath.lineTo(centerX, centerY - radius);
-        hexagonPath.lineTo(centerX + triangleHeight, centerY - radius / 2);
-        hexagonPath.lineTo(centerX + triangleHeight, centerY + radius / 2);
-        hexagonPath.moveTo(centerX, centerY + radius);
+    private void calculatePath(float radius) {
+        float halfRadius = radius / 2f;
+        float triangleHeight = (float) (Math.sqrt(3.0) * halfRadius);
+        float centerX = getMeasuredWidth() / 2f;
+        float centerY = getMeasuredHeight() / 2f;
 
-        float radiusBorder = radius - 5;
-        float triangleBorderHeight = (float) (Math.sqrt(3) * radiusBorder / 2);
-        hexagonBorderPath.moveTo(centerX, centerY + radiusBorder);
-        hexagonBorderPath.lineTo(centerX - triangleBorderHeight, centerY + radiusBorder / 2);
-        hexagonBorderPath.lineTo(centerX - triangleBorderHeight, centerY - radiusBorder / 2);
-        hexagonBorderPath.lineTo(centerX, centerY - radiusBorder);
-        hexagonBorderPath.lineTo(centerX + triangleBorderHeight, centerY - radiusBorder / 2);
-        hexagonBorderPath.lineTo(centerX + triangleBorderHeight, centerY + radiusBorder / 2);
-        hexagonBorderPath.moveTo(centerX, centerY + radiusBorder);
+        this.hexagonPath.reset();
+        this.hexagonPath.moveTo(centerX, centerY + radius);
+        this.hexagonPath.lineTo(centerX - triangleHeight, centerY + halfRadius);
+        this.hexagonPath.lineTo(centerX - triangleHeight, centerY - halfRadius);
+        this.hexagonPath.lineTo(centerX, centerY - radius);
+        this.hexagonPath.lineTo(centerX + triangleHeight, centerY - halfRadius);
+        this.hexagonPath.lineTo(centerX + triangleHeight, centerY + halfRadius);
+        this.hexagonPath.close();
+
+        float radiusBorder = radius - 5f;
+        float halfRadiusBorder = radiusBorder / 2f;
+        float triangleBorderHeight = (float) (Math.sqrt(3.0) * halfRadiusBorder);
+
+        this.hexagonBorderPath.reset();
+        this.hexagonBorderPath.moveTo(centerX, centerY + radiusBorder);
+        this.hexagonBorderPath.lineTo(centerX - triangleBorderHeight, centerY + halfRadiusBorder);
+        this.hexagonBorderPath.lineTo(centerX - triangleBorderHeight, centerY - halfRadiusBorder);
+        this.hexagonBorderPath.lineTo(centerX, centerY - radiusBorder);
+        this.hexagonBorderPath.lineTo(centerX + triangleBorderHeight, centerY - halfRadiusBorder);
+        this.hexagonBorderPath.lineTo(centerX + triangleBorderHeight, centerY + halfRadiusBorder);
+        this.hexagonBorderPath.close();
         invalidate();
     }
 
     @Override
     public void onDraw(Canvas c) {
+        c.drawPath(hexagonBorderPath, mBorderPaint);
+        c.clipPath(hexagonPath, Region.Op.INTERSECT);
+        c.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+        System.out.println("Ran");
         super.onDraw(c);
-        c.clipPath(hexagonBorderPath, Region.Op.DIFFERENCE);
-        c.drawColor(Color.WHITE);
-        c.save();
-        c.clipPath(hexagonPath, Region.Op.DIFFERENCE);
-        c.drawColor(maskColor);
-        c.save();
     }
 
-    // getting the view size and default radius
     @Override
-    public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    public void onMeasure(int widthMeasureSpec, int heightMeasureSpec){
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        width = MeasureSpec.getSize(widthMeasureSpec);
-        height = MeasureSpec.getSize(heightMeasureSpec);
-        radius = height / 2 - 10;
-        calculatePath();
+        int width = MeasureSpec.getSize(widthMeasureSpec);
+        int height = MeasureSpec.getSize(heightMeasureSpec);
+        calculatePath(Math.min(width / 2f, height / 2f) - 10f);
+        setMeasuredDimension(width, height);
     }
 }

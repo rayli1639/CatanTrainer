@@ -41,7 +41,7 @@ public class BoardView extends AppCompatImageView {
     }
 
     public void setRadius(float radius) {
-        calculatePath(radius);
+        calculatePath(radius, 0f, 0f);
     }
 
     public void setBorderColor(int color) {
@@ -49,11 +49,13 @@ public class BoardView extends AppCompatImageView {
         invalidate();
     }
 
-    private void calculatePath(float radius) {
+    private void calculatePath(float radius, float centerX, float centerY) {
         float halfRadius = radius / 2f;
         float triangleHeight = (float) (Math.sqrt(3.0) * halfRadius);
-        float centerX = getMeasuredWidth() / 2f;
-        float centerY = getMeasuredHeight() / 2f;
+        if (centerX == 0 && centerY == 0) {
+            centerX = getMeasuredWidth() / 2f;
+            centerY = getMeasuredHeight() / 2f;
+        }
 
         this.hexagonPath.reset();
         this.hexagonPath.moveTo(centerX, centerY + radius);
@@ -93,7 +95,9 @@ public class BoardView extends AppCompatImageView {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         int width = MeasureSpec.getSize(widthMeasureSpec);
         int height = MeasureSpec.getSize(heightMeasureSpec);
-        calculatePath(Math.min(width / 2f, height / 2f) - 10f);
+        for (int i = 0; i < 19; i++) {
+            calculatePath(Math.min(width / 5f, height / 5f) - 20f, (float) i, (float) i);
+        }
         setMeasuredDimension(width, height);
     }
 }

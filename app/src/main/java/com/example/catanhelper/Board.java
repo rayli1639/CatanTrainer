@@ -40,14 +40,14 @@ public class Board {
                 int randNum = numbers.get((int) (Math.random() * numbers.size()));
                 numbers.remove(new Integer(randNum));
                 if (randNum == 0) {
-                    row.add(new Hex(false));
+                    row.add(new Hex(false, 0f));// TO BE CHANGED
                 } else {
                     Object[] resKeys = resources.keySet().toArray();
                     while (true) {
                         Resource resKey = (Resource) (resKeys[(int) (Math.random() * resKeys.length)]);
                         if (resources.get(resKey) != 0) {
                             resources.put(resKey, resources.get(resKey) - 1);
-                            row.add(new Hex(resKey, randNum, false));
+                            row.add(new Hex(resKey, randNum, false, 0f)); // TO BE CHANGED
                             break;
                         }
                     }

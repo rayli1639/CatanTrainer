@@ -4,17 +4,20 @@ public class Hex {
     private Resource res;
     private int num;
     private boolean portCon;
-    Hex(boolean portCon) {
-        this(Resource.DESERT, 0, portCon);
+    private float center;
+
+    Hex(boolean portCon, float center) {
+        this(Resource.DESERT, 0, portCon, center);
     }
 
     /**
      * Constructs a hex with given resource and portCon data.
      */
-    Hex(Resource res, int num, boolean portCon) {
+    Hex(Resource res, int num, boolean portCon, float center) {
         this.res = res;
         this.num = num;
         this.portCon = portCon;
+        this.center = center;
     }
     public Resource getRes() {
         return res;

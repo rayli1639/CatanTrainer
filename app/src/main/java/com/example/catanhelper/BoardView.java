@@ -8,11 +8,18 @@ import android.graphics.PorterDuff;
 import android.graphics.Region;
 import android.util.AttributeSet;
 import androidx.appcompat.widget.AppCompatImageView;
+import android.util.Log;
+
+import java.util.ArrayList;
 
 public class BoardView extends AppCompatImageView {
     private Path hexagonPath;
     private Path hexagonBorderPath;
     private Paint mBorderPaint;
+    private Integer marginX;
+    private Integer marginY;
+    private Float radius;
+    private Board b = new Board();
 
     public BoardView(Context context) {
         super(context);
@@ -57,7 +64,7 @@ public class BoardView extends AppCompatImageView {
             centerY = getMeasuredHeight() / 2f;
         }
 
-        this.hexagonPath.reset();
+        //this.hexagonPath.reset();
         this.hexagonPath.moveTo(centerX, centerY + radius);
         this.hexagonPath.lineTo(centerX - triangleHeight, centerY + halfRadius);
         this.hexagonPath.lineTo(centerX - triangleHeight, centerY - halfRadius);
@@ -70,7 +77,7 @@ public class BoardView extends AppCompatImageView {
         float halfRadiusBorder = radiusBorder / 2f;
         float triangleBorderHeight = (float) (Math.sqrt(3.0) * halfRadiusBorder);
 
-        this.hexagonBorderPath.reset();
+        //this.hexagonBorderPath.reset();
         this.hexagonBorderPath.moveTo(centerX, centerY + radiusBorder);
         this.hexagonBorderPath.lineTo(centerX - triangleBorderHeight, centerY + halfRadiusBorder);
         this.hexagonBorderPath.lineTo(centerX - triangleBorderHeight, centerY - halfRadiusBorder);
@@ -78,16 +85,30 @@ public class BoardView extends AppCompatImageView {
         this.hexagonBorderPath.lineTo(centerX + triangleBorderHeight, centerY - halfRadiusBorder);
         this.hexagonBorderPath.lineTo(centerX + triangleBorderHeight, centerY + halfRadiusBorder);
         this.hexagonBorderPath.close();
-        invalidate();
+        //invalidate();
     }
 
     @Override
     public void onDraw(Canvas c) {
-        c.drawPath(hexagonBorderPath, mBorderPaint);
-        c.clipPath(hexagonPath, Region.Op.INTERSECT);
-        c.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-        System.out.println("Ran");
-        super.onDraw(c);
+        int tileCount = 3;
+        int increment = 1;
+        for (int i = 0; i < 5; i++) {
+            if (tileCount == 5) {
+                increment = -1;
+            }
+            for (int j = 0; j < tileCount; j++) {
+                calculatePath(this.radius - 20f,
+                        (float) (this.marginX + 2*j*this.radius - 10f),
+                        (float) (this.marginY + 2*i*this.radius - 10f));
+                c.drawPath(hexagonBorderPath, mBorderPaint);
+                c.clipPath(hexagonPath, Region.Op.INTERSECT);
+                c.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+                c.save();
+            }
+            tileCount += increment;
+        }
+        postInvalidate();
+        //super.onDraw(c);
     }
 
     @Override
@@ -95,9 +116,9 @@ public class BoardView extends AppCompatImageView {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         int width = MeasureSpec.getSize(widthMeasureSpec);
         int height = MeasureSpec.getSize(heightMeasureSpec);
-        for (int i = 0; i < 19; i++) {
-            calculatePath(Math.min(width / 5f, height / 5f) - 20f, (float) i, (float) i);
-        }
+        this.radius = Math.min(width / 7f, height / 7f);
+        this.marginX = width / 5;
+        this.marginY = height / 3;
         setMeasuredDimension(width, height);
     }
 }

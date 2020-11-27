@@ -12,6 +12,7 @@
         android:background="@android:color/holo_green_light"/>
     <!--
     android:src = "@drawable/ore"
+    android:background="@android:color/holo_green_light"/>
     -->
 
 </androidx.constraintlayout.widget.ConstraintLayout>
